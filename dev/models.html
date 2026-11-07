@@ -1,0 +1,20 @@
+<!doctype html><meta charset="utf-8"><title>Hoja de modelos</title>
+<style>body{margin:0;background:#05070c}canvas{display:block}</style>
+<canvas id="c" width="1600" height="900"></canvas>
+<script type="module">
+import { drawBat, drawOyente, drawMoth, drawCrystal, drawRift } from '../src/models.js';
+const c = document.getElementById('c'); const ctx = c.getContext('2d');
+const t = Number(new URLSearchParams(location.search).get('t') || 0.3);
+function at(x, y, s, rot, fn) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.rotate(rot); fn(); ctx.restore(); }
+ctx.fillStyle = '#05070c'; ctx.fillRect(0,0,1600,900);
+at(220, 230, 300, -Math.PI/2, () => drawBat(ctx, { flap: 0, glide: 0, mode: 'portrait' }));
+at(560, 230, 300, -Math.PI/2, () => drawBat(ctx, { flap: Math.PI*0.6, glide: 0, charge: 0.8 }));
+at(900, 230, 300, -Math.PI/2, () => drawBat(ctx, { flap: Math.PI, glide: 0 }));
+at(1240, 230, 300, -Math.PI/2, () => drawBat(ctx, { flap: 0, glide: 1 }));
+at(260, 650, 280, -Math.PI/2, () => drawOyente(ctx, { mode: 'portrait', step: 0.5, t, state: 'wander' }));
+at(620, 650, 280, -Math.PI/2, () => drawOyente(ctx, { mode: 'echo', step: 2, t, state: 'hunt' }));
+at(950, 650, 500, 0, () => drawMoth(ctx, { t, glow: 0.8 }));
+at(1200, 650, 220, 0, () => drawCrystal(ctx, { id: 3, ring: 0.6, t }));
+at(1450, 650, 120, 0, () => drawRift(ctx, { t, open: 1 }));
+at(1450, 820, 120, 0, () => drawRift(ctx, { t, open: 0 }));
+</script>

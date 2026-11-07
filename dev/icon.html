@@ -1,0 +1,33 @@
+<!doctype html><meta charset="utf-8"><title>Icono</title>
+<style>body{margin:0;background:transparent}canvas{display:block}</style>
+<canvas id="c" width="512" height="512"></canvas>
+<script type="module">
+import { drawBat } from '../src/models.js';
+const c = document.getElementById('c'); const ctx = c.getContext('2d');
+const S = 512;
+// fondo redondeado
+const r = 108;
+ctx.beginPath();
+ctx.moveTo(r, 0); ctx.arcTo(S, 0, S, S, r); ctx.arcTo(S, S, 0, S, r); ctx.arcTo(0, S, 0, 0, r); ctx.arcTo(0, 0, S, 0, r); ctx.closePath();
+const bg = ctx.createRadialGradient(S/2, S*0.46, 10, S/2, S/2, S*0.72);
+bg.addColorStop(0, '#0f2236'); bg.addColorStop(0.55, '#060d18'); bg.addColorStop(1, '#02050a');
+ctx.fillStyle = bg; ctx.fill();
+ctx.save(); ctx.clip();
+// ondas de eco
+for (let i = 0; i < 4; i++) {
+  ctx.beginPath();
+  ctx.arc(S/2, S*0.47, 92 + i * 52, 0, Math.PI * 2);
+  ctx.strokeStyle = `rgba(120,230,255,${0.55 - i * 0.12})`;
+  ctx.lineWidth = 7 - i;
+  ctx.shadowColor = 'rgba(120,230,255,0.8)'; ctx.shadowBlur = 18;
+  ctx.stroke();
+}
+ctx.shadowBlur = 0;
+// murciélago
+ctx.translate(S/2, S*0.52);
+ctx.scale(285, 285);
+ctx.rotate(-Math.PI/2);
+drawBat(ctx, { flap: 0, glide: 1, mode: 'portrait', rim: [150, 235, 255], lineWidth: 0.014 });
+ctx.restore();
+window.ready = true;
+</script>

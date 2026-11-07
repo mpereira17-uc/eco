@@ -1,0 +1,7 @@
+node_modules/
+dist/
+launcher/game/
+launcher/dist/
+launcher/*.syso
+launcher/icon-*.png
+release/

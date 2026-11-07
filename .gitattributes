@@ -1,0 +1,5 @@
+* text=auto eol=lf
+launcher/extra/LEEME.txt -text
+*.woff2 binary
+*.png binary
+*.jpg binary

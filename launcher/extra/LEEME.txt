@@ -1,0 +1,33 @@
+﻿ECO · una historia contada en ecos
+===================================
+
+CÓMO JUGAR
+1. Descomprime esta carpeta donde quieras (por ejemplo, en el Escritorio).
+2. Abre Eco.exe.
+   La primera vez Windows puede mostrar "Windows protegió tu PC" porque el
+   juego no está firmado. Pulsa "Más información" y luego "Ejecutar de todas formas".
+3. Deja Eco.exe junto a WebView2Loader.dll: los dos hacen falta.
+
+Funciona en Windows 10 y 11 (64 bits). Usa WebView2, que ya viene con Windows.
+Si tu equipo no lo tuviera, el juego se abre en tu navegador.
+
+Tu progreso y tus ajustes se guardan solos en %APPDATA%\Eco.
+
+¿Sin Windows? Abre version-navegador\index.html en cualquier navegador.
+
+CONTROLES
+  Volar ............... WASD o flechas  (mando: stick)
+  Gritar .............. mantén Espacio o clic y suelta  (mando: A)
+  Planear en silencio . Mayús  (mando: gatillos)
+  Pausa y mapa ........ Esc  (mando: Start)
+  Pantalla completa ... F11
+
+CONSEJOS
+  - No ves nada: grita y las paredes que toca tu eco se iluminan.
+  - Un grito largo ve más lejos, pero también se oye más lejos.
+  - Los Oyentes van hacia donde sonó tu grito, no hacia donde estás.
+  - Si oyen tu aleteo de cerca, te persiguen: aléjate rápido y luego planea.
+  - Reúne todas las polillas de luz para abrir la grieta de salida.
+  - Juega con auriculares: cada eco suena del lado de su pared.
+
+Las licencias de las fuentes y componentes usados están en la carpeta "licencias".

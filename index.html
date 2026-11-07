@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Eco</title>
+  <meta name="description" content="Eco: una historia contada en ecos. Un juego de ecolocalización en cuevas procedurales.">
+  <meta name="theme-color" content="#03060b">
+  <link rel="icon" href="assets/icon-64.png" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="world" aria-hidden="true"></canvas>
+
+  <!-- ─────────── Portada ─────────── -->
+  <section class="screen" id="screen-title" data-screen="title">
+    <div class="title-wrap">
+      <p class="eyebrow">Una historia contada en ecos</p>
+      <h1 class="logo" aria-label="Eco">
+        <span class="l">E</span><span class="l">C</span><span class="l o">O<svg class="logo-rings" viewBox="0 0 400 400" aria-hidden="true"><circle cx="200" cy="200" r="60"></circle><circle cx="200" cy="200" r="60"></circle><circle cx="200" cy="200" r="60"></circle></svg></span>
+      </h1>
+      <nav class="menu" aria-label="Menú principal">
+        <button data-action="continue" hidden>Continuar <small id="continue-label"></small></button>
+        <button data-action="new">Nueva partida</button>
+        <button data-action="chapters">Capítulos</button>
+        <button data-action="bestiary">Bestiario</button>
+        <button data-action="howto">Cómo se juega</button>
+        <button data-action="settings">Ajustes</button>
+        <button data-action="credits">Créditos</button>
+        <button data-action="exit" hidden>Salir</button>
+      </nav>
+    </div>
+    <footer class="title-foot">
+      <svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>
+      Juega con auriculares: cada eco te dice de qué lado está la pared.
+    </footer>
+    <div class="version">v1.0 · hecho de ruido y oscuridad</div>
+  </section>
+
+  <!-- ─────────── Narración (prólogo / epílogo) ─────────── -->
+  <section class="screen" id="screen-story" data-screen="story">
+    <div class="story">
+      <div class="story-ring" aria-hidden="true"></div>
+      <p class="story-line" id="story-line"></p>
+      <div class="story-progress" id="story-progress"></div>
+    </div>
+    <div class="story-hint"><span class="for-keys"><span class="key">Espacio</span> continuar</span><span class="for-touch">Toca para continuar</span> <button class="ghost" data-action="skip-story">Saltar</button></div>
+  </section>
+
+  <!-- ─────────── Carta de capítulo ─────────── -->
+  <section class="screen" id="screen-chapter" data-screen="chapter">
+    <div class="chapter-card">
+      <div class="chapter-num" id="cc-num">Capítulo I</div>
+      <h2 class="chapter-name" id="cc-name"></h2>
+      <p class="chapter-sub" id="cc-sub"></p>
+      <div class="chapter-text" id="cc-text"></div>
+      <div class="chapter-staff" id="cc-staff"></div>
+      <button class="primary" data-action="descend"><span class="key">Espacio</span> Descender</button>
+    </div>
+  </section>
+
+  <!-- ─────────── HUD ─────────── -->
+  <section class="hud off" id="hud">
+    <div class="hud-chapter"><span class="num" id="hud-num">I</span><span class="name" id="hud-name"></span></div>
+    <div class="hud-staff" id="hud-staff" aria-label="Notas recuperadas"></div>
+    <div class="hud-buttons">
+      <button class="icon-btn" data-action="pause" aria-label="Pausa y mapa">
+        <svg viewBox="0 0 24 24" class="ico"><path d="M9 5v14M15 5v14"/></svg>
+      </button>
+    </div>
+    <div class="hud-noise">
+      <canvas id="noise-meter" width="200" height="44"></canvas>
+      <div><span class="label">Ruido</span><span class="mode" id="noise-mode">Aleteo</span></div>
+    </div>
+    <div class="hud-keys" id="hud-keys">
+      <span><span class="key">WASD</span> volar</span>
+      <span><span class="key">Espacio</span> gritar (mantén para más alcance)</span>
+      <span><span class="key">Mayús</span> planear en silencio</span>
+      <span><span class="key">Esc</span> mapa</span>
+    </div>
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+  </section>
+
+  <!-- ─────────── Controles táctiles ─────────── -->
+  <section class="touch" id="touch" hidden>
+    <div class="stick" id="stick"><div class="stick-knob" id="stick-knob"></div></div>
+    <button class="touch-btn glide" id="touch-glide">Planear</button>
+    <button class="touch-btn shout" id="touch-shout">Grito</button>
+  </section>
+
+  <!-- ─────────── Pausa + cartografía ─────────── -->
+  <section class="screen overlay" id="screen-pause" data-screen="pause">
+    <div class="pause-grid">
+      <div class="pause-side">
+        <p class="eyebrow">Pausa</p>
+        <h2 class="panel-title" id="pause-chapter"></h2>
+        <nav class="menu small">
+          <button data-action="resume">Reanudar</button>
+          <button data-action="restart">Reiniciar capítulo</button>
+          <button data-action="settings">Ajustes</button>
+          <button data-action="bestiary">Bestiario</button>
+          <button data-action="quit">Salir a la portada</button>
+        </nav>
+        <dl class="stats" id="pause-stats"></dl>
+      </div>
+      <figure class="map-frame">
+        <canvas id="map-canvas" width="900" height="600"></canvas>
+        <figcaption>Cartografía del eco · solo lo que has oído</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ─────────── Muerte ─────────── -->
+  <section class="screen overlay red" id="screen-death" data-screen="death">
+    <div class="center-card">
+      <p class="eyebrow danger">Silencio</p>
+      <h2 class="big-line" id="death-line"></h2>
+      <dl class="stats inline" id="death-stats"></dl>
+      <nav class="menu row">
+        <button class="primary" data-action="retry"><span class="key">Espacio</span> Intentarlo de nuevo</button>
+        <button data-action="quit">Portada</button>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ─────────── Capítulo superado ─────────── -->
+  <section class="screen overlay" id="screen-complete" data-screen="complete">
+    <div class="center-card">
+      <p class="eyebrow">Capítulo superado</p>
+      <h2 class="big-line" id="complete-name"></h2>
+      <div class="chapter-staff big" id="complete-staff"></div>
+      <dl class="stats inline" id="complete-stats"></dl>
+      <nav class="menu row">
+        <button class="primary" data-action="next"><span class="key">Espacio</span> Seguir descendiendo</button>
+        <button data-action="quit">Portada</button>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ─────────── Capítulos ─────────── -->
+  <section class="screen panel" id="screen-chapters" data-screen="chapters">
+    <header class="panel-head">
+      <button class="back" data-action="back">← Volver</button>
+      <h2 class="panel-title">Capítulos</h2>
+    </header>
+    <div class="chapter-grid" id="chapter-grid"></div>
+  </section>
+
+  <!-- ─────────── Bestiario ─────────── -->
+  <section class="screen panel" id="screen-bestiary" data-screen="bestiary">
+    <header class="panel-head">
+      <button class="back" data-action="back">← Volver</button>
+      <h2 class="panel-title">Bestiario</h2>
+    </header>
+    <div class="codex" id="codex"></div>
+  </section>
+
+  <!-- ─────────── Cómo se juega ─────────── -->
+  <section class="screen panel" id="screen-howto" data-screen="howto">
+    <header class="panel-head">
+      <button class="back" data-action="back">← Volver</button>
+      <h2 class="panel-title">Cómo se juega</h2>
+    </header>
+    <div class="howto">
+      <div class="howto-keys">
+        <div class="keyrow"><span class="keys"><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span></span><span>o flechas · volar</span></div>
+        <div class="keyrow"><span class="keys"><span class="key wide">Espacio</span></span><span>o clic · mantén para cargar el grito y suelta para emitirlo</span></div>
+        <div class="keyrow"><span class="keys"><span class="key wide">Mayús</span></span><span>planear: lento y casi silencioso</span></div>
+        <div class="keyrow"><span class="keys"><span class="key">Esc</span></span><span>pausa y mapa de lo explorado</span></div>
+        <div class="keyrow"><span class="keys"><span class="key"><svg viewBox="0 0 24 24" class="ico" aria-label="Mando"><path d="M7 8h10a4 4 0 0 1 4 4l.6 4.2a2.2 2.2 0 0 1-3.9 1.7L15.5 15h-7l-2.2 2.9a2.2 2.2 0 0 1-3.9-1.7L3 12a4 4 0 0 1 4-4z"/><path d="M8 10.5v3M6.5 12h3"/><circle cx="16" cy="11" r=".6"/><circle cx="17.6" cy="12.8" r=".6"/></svg></span></span><span>con mando: stick para volar, A para gritar, gatillo para planear</span></div>
+      </div>
+      <ol class="howto-rules">
+        <li><strong>No ves nada.</strong> Tu grito viaja por la cueva y cada pared que toca brilla durante unos segundos. Lo que ya oíste queda dibujado como un mapa tenue.</li>
+        <li><strong>Un grito largo ve más lejos</strong>, pero también se oye más lejos. Un chasquido corto es casi seguro.</li>
+        <li><strong>Los Oyentes son ciegos.</strong> Cuando oyen un grito van hacia donde sonó, no hacia donde estás. Si oyen tu aleteo de cerca, te persiguen.</li>
+        <li><strong>Escapa y calla.</strong> Volando eres más veloz que ellos, pero haces ruido. Planeando no te oyen, pero avanzas despacio. Las ondas rojas en el suelo son sus pasos.</li>
+        <li><strong>Cristales resonantes:</strong> repiten tu grito desde donde están. Úsalos para ver lejos o para atraer a los Oyentes a otra parte.</li>
+        <li><strong>Reúne todas las polillas de luz</strong> del capítulo. Cada una es una nota de la canción; cuando la canción está completa, la grieta se abre y su viento te llama.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ─────────── Ajustes ─────────── -->
+  <section class="screen panel" id="screen-settings" data-screen="settings">
+    <header class="panel-head">
+      <button class="back" data-action="back">← Volver</button>
+      <h2 class="panel-title">Ajustes</h2>
+    </header>
+    <form class="settings" id="settings-form" onsubmit="return false">
+      <label class="field"><span>Volumen general</span><input type="range" min="0" max="1" step="0.05" name="volume"></label>
+      <label class="field"><span>Ambiente y música</span><input type="range" min="0" max="1" step="0.05" name="ambient"></label>
+      <label class="toggle"><input type="checkbox" name="shake"><span class="track"></span><span>Vibración de cámara</span></label>
+      <label class="toggle"><input type="checkbox" name="glow"><span class="track"></span><span>Resplandor de los ecos</span></label>
+      <label class="toggle"><input type="checkbox" name="grain"><span class="track"></span><span>Grano de película</span></label>
+      <label class="toggle"><input type="checkbox" name="footsteps"><span class="track"></span><span>Ver los pasos de los Oyentes</span></label>
+      <button type="button" class="ghost" data-action="fullscreen">Pantalla completa · F11</button>
+      <button type="button" class="ghost danger" data-action="reset-progress">Borrar progreso</button>
+    </form>
+  </section>
+
+  <!-- ─────────── Créditos ─────────── -->
+  <section class="screen panel" id="screen-credits" data-screen="credits">
+    <header class="panel-head">
+      <button class="back" data-action="back">← Volver</button>
+      <h2 class="panel-title">Créditos</h2>
+    </header>
+    <div class="credits">
+      <p class="eyebrow">Eco</p>
+      <p>Diseño, código, modelos, historia, música y sonido generados por Claude para pepe, en una noche.</p>
+      <p>Todo lo que ves y oyes se calcula en tiempo real: no hay imágenes ni grabaciones. Los modelos son trazos vectoriales animados; la música y los ecos son osciladores y ruido filtrado.</p>
+      <p>Tipografías: Cormorant Garamond y Space Grotesk, con licencia SIL Open Font License.</p>
+    </div>
+  </section>
+
+  <div class="fade" id="fade"></div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
